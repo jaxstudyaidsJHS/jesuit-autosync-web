@@ -25,3 +25,20 @@ jobs:
       - name: Test portable Swift core
         run: swift test --package-path ios/JesuitScoreboardsCore
 # Intentionally NO auto-deploy or Apple signing; those require school approval.
+
+  go-authority:
+    name: Go authority tests and Mac cross-builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: mac/authority/go.mod
+      - name: Race-tested authoritative clock and command engine
+        run: go test -race ./...
+        working-directory: mac/authority
+      - name: Compile Apple Silicon and Intel authority prototypes
+        run: |
+          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build ./cmd/jesuit-authority
+          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build ./cmd/jesuit-authority
+        working-directory: mac/authority
