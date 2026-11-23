@@ -1,0 +1,27 @@
+name: Foundation CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  javascript:
+    name: Protocol and repository safety
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
+      - run: node scripts/check-repository.mjs
+  swift-core:
+    name: Swift core tests
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test portable Swift core
+        run: swift test --package-path ios/JesuitScoreboardsCore
+# Intentionally NO auto-deploy or Apple signing; those require school approval.

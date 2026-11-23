@@ -1,0 +1,39 @@
+# Credentials and signing materials
+.env
+.env.*
+!.env.example
+**/GoogleService-Info.plist
+**/google-services.json
+**/*service-account*.json
+**/*adminsdk*.json
+**/*.p8
+**/*.p12
+**/*.mobileprovision
+**/*.pem
+**/*.key
+**/*.cer
+**/*.pfx
+**/*.keystore
+**/AuthKey_*.p8
+
+# School media and legacy binaries: review permissions before committing
+*.zip
+*.dmg
+*.app/
+*.xcarchive/
+*.ipa
+*.mp4
+*.braw
+assets/logos/
+assets/rosters/
+legacy/private/
+
+# Xcode and build output
+.DS_Store
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+node_modules/
+coverage/

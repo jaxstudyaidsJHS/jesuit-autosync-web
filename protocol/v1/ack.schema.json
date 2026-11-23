@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/jesuit-scoreboards/protocol/v1/ack.schema.json",
+  "title": "Jesuit Scoreboards v1 command acknowledgement",
+  "type": "object",
+  "required": [
+    "status",
+    "revision"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "applied",
+        "conflict",
+        "duplicate",
+        "invalid",
+        "unauthorized",
+        "unavailable"
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "commandId": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "duplicate": {
+      "type": "boolean"
+    }
+  }
+}

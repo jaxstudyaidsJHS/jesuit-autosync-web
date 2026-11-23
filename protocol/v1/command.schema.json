@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/jesuit-scoreboards/protocol/v1/command.schema.json",
+  "title": "Jesuit Scoreboards v1 command",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "id",
+    "sport",
+    "expectedRevision",
+    "type",
+    "payload"
+  ],
+  "properties": {
+    "protocol": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,128}$"
+    },
+    "sport": {
+      "enum": [
+        "football",
+        "basketball",
+        "baseball",
+        "lacrosse",
+        "soccer"
+      ]
+    },
+    "expectedRevision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "type": {
+      "enum": [
+        "score.set",
+        "score.add",
+        "period.set",
+        "clock.start",
+        "clock.stop",
+        "clock.reset"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "score.set",
+              "score.add"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "team",
+              "points"
+            ],
+            "properties": {
+              "team": {
+                "enum": [
+                  "home",
+                  "away"
+                ]
+              },
+              "points": {
+                "type": "integer"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "period.set"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "period"
+            ],
+            "properties": {
+              "period": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "clock.reset"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "remainingMs"
+            ],
+            "properties": {
+              "remainingMs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 86400000
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "clock.start",
+              "clock.stop"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "maxProperties": 0
+          }
+        }
+      }
+    }
+  ]
+}
