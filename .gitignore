@@ -28,7 +28,7 @@ assets/logos/
 assets/rosters/
 legacy/private/
 
-# Xcode and build output
+# XcodeGen, Xcode and build output
 .DS_Store
 .build/
 .swiftpm/
@@ -37,3 +37,7 @@ DerivedData/
 xcuserdata/
 node_modules/
 coverage/
+.netlify/
+ios/JesuitScoreboardsApp/Generated/
+ios/JesuitScoreboardsApp/*.xcodeproj/
+ios/JesuitScoreboardsApp/*.xcworkspace/

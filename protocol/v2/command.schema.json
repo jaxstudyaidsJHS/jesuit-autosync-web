@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Jesuit Scoreboards 2.0 Mac authority command (staging contract)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "gameId",
+    "sport",
+    "id",
+    "expectedRevision",
+    "type",
+    "payload"
+  ],
+  "properties": {
+    "protocol": {
+      "const": 2
+    },
+    "gameId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "sport": {
+      "enum": [
+        "football",
+        "basketball",
+        "baseball",
+        "lacrosse",
+        "soccer"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,128}$"
+    },
+    "expectedRevision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "type": {
+      "enum": [
+        "score.set",
+        "score.add",
+        "period.set",
+        "clock.start",
+        "clock.stop",
+        "clock.reset"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "score.set"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "team",
+              "points"
+            ],
+            "properties": {
+              "team": {
+                "enum": [
+                  "home",
+                  "away"
+                ]
+              },
+              "points": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "score.add"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "team",
+              "points"
+            ],
+            "properties": {
+              "team": {
+                "enum": [
+                  "home",
+                  "away"
+                ]
+              },
+              "points": {
+                "type": "integer",
+                "minimum": -10,
+                "maximum": 10,
+                "not": {
+                  "const": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "period.set"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "period"
+            ],
+            "properties": {
+              "period": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "clock.reset"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "remainingMs"
+            ],
+            "properties": {
+              "remainingMs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 86400000
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "clock.start",
+              "clock.stop"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "maxProperties": 0
+          }
+        }
+      }
+    }
+  ]
+}

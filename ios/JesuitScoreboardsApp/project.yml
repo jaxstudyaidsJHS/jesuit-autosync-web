@@ -1,0 +1,40 @@
+name: JesuitScoreboardsDev
+options:
+  bundleIdPrefix: org.example
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  JesuitScoreboardsCore:
+    path: ../JesuitScoreboardsCore
+targets:
+  JesuitScoreboardsDev:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    dependencies:
+      - package: JesuitScoreboardsCore
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleDisplayName: Jesuit Scoreboards DEV
+        UILaunchScreen: {}
+        NSCameraUsageDescription: "Camera access will be used to read scoreboards only when you start a scanning session. The current development shell does not capture images."
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.example.jesuitscoreboards.dev
+        SWIFT_VERSION: "5.0"
+        SWIFT_STRICT_CONCURRENCY: complete
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+schemes:
+  JesuitScoreboardsDev:
+    build:
+      targets:
+        JesuitScoreboardsDev: all
+    run:
+      config: Debug
+    archive:
+      config: Release
