@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Jesuit Scoreboards 2.0 Mac authority game state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "gameId",
+    "sport",
+    "revision",
+    "homeScore",
+    "awayScore",
+    "period",
+    "clock"
+  ],
+  "properties": {
+    "protocol": {
+      "const": 2
+    },
+    "gameId": {
+      "type": "string",
+      "minLength": 8
+    },
+    "sport": {
+      "enum": [
+        "football",
+        "basketball",
+        "baseball",
+        "lacrosse",
+        "soccer"
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "homeScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999
+    },
+    "awayScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999
+    },
+    "period": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20
+    },
+    "clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "remainingMs",
+        "running"
+      ],
+      "properties": {
+        "remainingMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 86400000
+        },
+        "running": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

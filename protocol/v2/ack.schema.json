@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Jesuit Scoreboards 2.0 Mac command acknowledgement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "commandId",
+    "revision"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "applied",
+        "duplicate",
+        "conflict",
+        "id_conflict",
+        "invalid",
+        "unavailable"
+      ]
+    },
+    "commandId": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reason": {
+      "type": "string"
+    },
+    "duplicate": {
+      "type": "boolean"
+    }
+  }
+}
