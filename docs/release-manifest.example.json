@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "product": "Jesuit Scoreboards",
+  "channel": "development",
+  "targetVersion": "2.0.0-dev.1",
+  "protocolVersion": 2,
+  "ios": {
+    "status": "unsigned-demo",
+    "authenticated": false,
+    "remoteWrites": false,
+    "cameraCapture": false
+  },
+  "mac": {
+    "status": "off-air-prototype",
+    "port": 8784,
+    "connectedToLegacyOBS": false
+  },
+  "cloud": {
+    "firebaseConnected": false,
+    "netlifyProductionConnected": false,
+    "stagingRules": "default-deny"
+  },
+  "release": {
+    "broadcastReady": false,
+    "requiresRealDeviceAcceptance": true,
+    "automaticDeployment": false
+  }
+}
