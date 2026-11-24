@@ -15,6 +15,8 @@ struct RootView: View {
                 .tabItem { Label("Remote", systemImage: "slider.horizontal.3") }
             CameraSetupView()
                 .tabItem { Label("Camera", systemImage: "camera.viewfinder") }
+            FirebaseStagingView()
+                .tabItem { Label("Staging", systemImage: "cloud") }
             SystemView()
                 .tabItem { Label("System", systemImage: "waveform.path.ecg") }
         }
@@ -30,7 +32,7 @@ private struct StatusBanner: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("OFF-AIR DEMONSTRATION")
                     .font(.caption.bold())
-                Text("No Firebase, Mac or OBS commands are connected.")
+                Text("No Mac or OBS commands are enabled. Staging is read-only.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -252,7 +254,7 @@ private struct SystemView: View {
                         LabeledContent("Mode", value: "Demo / read-only")
                     }
                     Panel(title: "Connectivity") {
-                        LabeledContent("iPhone ↔ Firebase", value: "Not configured")
+                        LabeledContent("iPhone ↔ Firebase", value: "See Staging tab")
                         LabeledContent("Firebase ↔ Mac", value: "Not configured")
                         LabeledContent("Mac ↔ OBS", value: "Not configured")
                     }
