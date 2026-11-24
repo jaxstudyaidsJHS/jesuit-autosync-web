@@ -27,10 +27,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: '6.2.1'
-      - run: swift --version
+      - name: Check preinstalled Swift toolchain
+        run: swift --version
       - name: Compile and test all shared Swift models
         run: swift test --package-path ios/JesuitScoreboardsCore
 
