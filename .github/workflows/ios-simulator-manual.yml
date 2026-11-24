@@ -27,15 +27,23 @@ jobs:
             brew install xcodegen
           fi
           xcodegen --version
-      - name: Provision optional staging client configuration
+      - name: Provision and validate staging client configuration
         env:
           STAGING_PLIST: ${{ secrets.JESUIT_STAGING_GOOGLE_SERVICE_INFO }}
         run: |
-          if [ -n "$STAGING_PLIST" ]; then
-            mkdir -p ios/JesuitScoreboardsApp/Config
-            printf '%s' "$STAGING_PLIST" > ios/JesuitScoreboardsApp/Config/GoogleService-Info.plist
-            plutil -lint ios/JesuitScoreboardsApp/Config/GoogleService-Info.plist
+          if [ -z "$STAGING_PLIST" ]; then
+            echo "::error::Missing JESUIT_STAGING_GOOGLE_SERVICE_INFO repository secret"
+            exit 1
           fi
+          mkdir -p ios/JesuitScoreboardsApp/Config
+          CONFIG=ios/JesuitScoreboardsApp/Config/GoogleService-Info.plist
+          printf '%s' "$STAGING_PLIST" > "$CONFIG"
+          plutil -lint "$CONFIG"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :PROJECT_ID' "$CONFIG")" = "jesuit-scoreboards-2-0-staging"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :BUNDLE_ID' "$CONFIG")" = "org.example.jesuitscoreboards.dev"
+          DB_URL="$(/usr/libexec/PlistBuddy -c 'Print :DATABASE_URL' "$CONFIG")"
+          test "${DB_URL%/}" = "https://jesuit-scoreboards-2-0-staging-default-rtdb.firebaseio.com"
+          echo "Verified staging client configuration"
       - name: Generate iPhone Xcode project
         working-directory: ios/JesuitScoreboardsApp
         run: xcodegen generate --spec project.yml
@@ -59,6 +67,8 @@ jobs:
         run: |
           APP="$RUNNER_TEMP/JesuitDerivedData/Build/Products/Debug-iphonesimulator/JesuitScoreboardsDev.app"
           test -d "$APP"
+          test -f "$APP/GoogleService-Info.plist"
+          /usr/bin/cmp -s "$APP/GoogleService-Info.plist" ios/JesuitScoreboardsApp/Config/GoogleService-Info.plist || { echo "Checking packaged configuration"; test "$(/usr/libexec/PlistBuddy -c 'Print :PROJECT_ID' "$APP/GoogleService-Info.plist")" = "jesuit-scoreboards-2-0-staging"; }
           /usr/bin/ditto -c -k --keepParent "$APP" "$RUNNER_TEMP/JesuitScoreboards2-Simulator-UNSIGNED.zip"
       - uses: actions/upload-artifact@v4
         with:
