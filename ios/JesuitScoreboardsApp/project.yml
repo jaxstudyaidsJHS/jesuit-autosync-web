@@ -15,6 +15,9 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      - path: Config/GoogleService-Info.plist
+        optional: true
+        buildPhase: resources
     dependencies:
       - package: JesuitScoreboardsCore
       - package: Firebase
