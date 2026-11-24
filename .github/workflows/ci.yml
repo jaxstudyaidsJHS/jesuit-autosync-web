@@ -1,15 +1,18 @@
-name: Jesuit Scoreboards 2.0 — build and safety checks
+name: Jesuit Scoreboards 2.0 — portable CI
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   javascript:
-    name: Browser protocol and remote safety tests
-    runs-on: ubuntu-latest
+    name: JavaScript protocol and remote safety
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,49 +20,34 @@ jobs:
           node-version: '22'
       - run: npm test
       - run: node scripts/check-repository.mjs
+
   swift-core:
-    name: Shared Swift protocol tests
-    runs-on: macos-15
+    name: Swift 6 shared core tests (Linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Test iOS/macOS portable Swift models
+      - name: Check preinstalled Swift toolchain
+        run: swift --version
+      - name: Compile and test all shared Swift models
         run: swift test --package-path ios/JesuitScoreboardsCore
+
   go-authority:
-    name: Go Mac authority race and cross-build tests
-    runs-on: ubuntu-latest
+    name: Go Mac authority tests and cross-build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: mac/authority/go.mod
-      - name: Verify durable command and clock behavior
+      - name: Race-test durable clock and commands
         run: go test -race ./...
         working-directory: mac/authority
-      - name: Cross-compile Apple Silicon and Intel prototypes
+      - name: Cross-compile macOS prototypes
         run: |
           GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o /tmp/jesuit-authority-arm64 ./cmd/jesuit-authority
           GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/jesuit-authority-amd64 ./cmd/jesuit-authority
         working-directory: mac/authority
-  ios-app:
-    name: iOS simulator compile (unsigned)
-    runs-on: macos-15
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install XcodeGen
-        run: |
-          if ! command -v xcodegen >/dev/null 2>&1; then
-            brew install xcodegen
-          fi
-      - name: Generate reproducible Xcode project
-        run: xcodegen generate --spec project.yml
-        working-directory: ios/JesuitScoreboardsApp
-      - name: Build iPhone simulator app without signing
-        run: |
-          xcodebuild -project JesuitScoreboardsDev.xcodeproj \
-            -scheme JesuitScoreboardsDev \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
-            CODE_SIGNING_ALLOWED=NO build
-        working-directory: ios/JesuitScoreboardsApp
-# CI NEVER deploys to Netlify, changes Firebase rules, or signs Apple builds.
+# NO production Netlify/Firebase changes and NO Apple signing here.
+# Physical iPhone simulator compilation requires the separate manual macOS workflow.
