@@ -4,6 +4,9 @@ options:
   deploymentTarget:
     iOS: "17.0"
 packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk.git
+    from: 11.15.0
   JesuitScoreboardsCore:
     path: ../JesuitScoreboardsCore
 targets:
@@ -14,6 +17,12 @@ targets:
       - path: Sources
     dependencies:
       - package: JesuitScoreboardsCore
+      - package: Firebase
+        product: FirebaseCore
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseDatabase
     info:
       path: Generated/Info.plist
       properties:
