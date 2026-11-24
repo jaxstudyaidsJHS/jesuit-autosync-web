@@ -1,0 +1,40 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "stagingGames": {
+      "$gameId": {
+        "state": {
+          ".read": "auth != null && auth.token.jesuitEnv === 'staging' && auth.token.jesuitGame === $gameId && (auth.token.jesuitRole === 'operator' || auth.token.jesuitRole === 'camera' || auth.token.jesuitRole === 'viewer' || auth.token.jesuitRole === 'bridge')",
+          ".write": false
+        },
+        "pings": {
+          ".read": "auth != null && auth.token.jesuitEnv === 'staging' && auth.token.jesuitGame === $gameId && auth.token.jesuitRole === 'bridge'",
+          "$deviceUid": {
+            "$pingId": {
+              ".read": "auth != null && auth.uid === $deviceUid && auth.token.jesuitEnv === 'staging' && auth.token.jesuitGame === $gameId && (auth.token.jesuitRole === 'operator' || auth.token.jesuitRole === 'camera')",
+              ".write": "auth != null && auth.uid === $deviceUid && auth.token.jesuitEnv === 'staging' && auth.token.jesuitGame === $gameId && (auth.token.jesuitRole === 'operator' || auth.token.jesuitRole === 'camera') && !data.exists() && newData.exists() && newData.hasChildren(['kind','id','at'])",
+              ".validate": "newData.hasChildren(['kind','id','at'])",
+              "kind": {
+                ".validate": "newData.isString() && newData.val() === 'ping'"
+              },
+              "id": {
+                ".validate": "newData.isString() && newData.val() === $pingId && newData.val().length >= 8 && newData.val().length <= 128"
+              },
+              "at": {
+                ".validate": "newData.isNumber() && newData.val() >= now - 60000 && newData.val() <= now + 30000"
+              },
+              "$other": {
+                ".validate": false
+              }
+            }
+          }
+        },
+        "receipts": {
+          ".read": "auth != null && auth.token.jesuitEnv === 'staging' && auth.token.jesuitGame === $gameId && (auth.token.jesuitRole === 'operator' || auth.token.jesuitRole === 'camera' || auth.token.jesuitRole === 'bridge')",
+          ".write": false
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,9 @@
-name: Jesuit 2.0 — iOS simulator build (manual macOS)
+name: Jesuit 2.0 — cloud Mac iPhone simulator build
 on:
+  pull_request:
+    paths:
+      - 'ios/**'
+      - '.github/workflows/ios-simulator-manual.yml'
   workflow_dispatch:
 
 permissions:
@@ -7,29 +11,51 @@ permissions:
 
 jobs:
   ios-simulator:
-    name: Generate and compile unsigned iOS simulator app
-    runs-on: macos-15
-    timeout-minutes: 45
+    name: Xcode — unsigned iPhone simulator build (Intel fallback)
+    runs-on: macos-15-intel
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
-      - name: Report developer tools
+      - name: Show cloud Mac environment
         run: |
+          sw_vers
           xcodebuild -version
           swift --version
-      - name: Install XcodeGen if unavailable
+      - name: Install XcodeGen
         run: |
           if ! command -v xcodegen >/dev/null 2>&1; then
             brew install xcodegen
           fi
-      - name: Generate Xcode project
-        run: xcodegen generate --spec project.yml
+          xcodegen --version
+      - name: Generate iPhone Xcode project
         working-directory: ios/JesuitScoreboardsApp
-      - name: Build unsigned iPhone simulator app
+        run: xcodegen generate --spec project.yml
+      - name: Resolve local Swift package
+        working-directory: ios/JesuitScoreboardsApp
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project JesuitScoreboardsDev.xcodeproj \
+            -scheme JesuitScoreboardsDev
+      - name: Build iPhone Simulator app (NO SIGNING)
+        working-directory: ios/JesuitScoreboardsApp
         run: |
           xcodebuild -project JesuitScoreboardsDev.xcodeproj \
-            -scheme JesuitScoreboardsDev -configuration Debug \
-            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -scheme JesuitScoreboardsDev \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/JesuitDerivedData" \
             CODE_SIGNING_ALLOWED=NO build
-        working-directory: ios/JesuitScoreboardsApp
-# This is a MANUAL validation step, not evidence of a TestFlight/signed app.
-# No production deploy, Apple account, Firebase, Mac broadcast or OBS mutation.
+      - name: Package simulator artifact
+        run: |
+          APP="$RUNNER_TEMP/JesuitDerivedData/Build/Products/Debug-iphonesimulator/JesuitScoreboardsDev.app"
+          test -d "$APP"
+          /usr/bin/ditto -c -k --keepParent "$APP" "$RUNNER_TEMP/JesuitScoreboards2-Simulator-UNSIGNED.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JesuitScoreboards2-Simulator-UNSIGNED
+          path: ${{ runner.temp }}/JesuitScoreboards2-Simulator-UNSIGNED.zip
+          if-no-files-found: error
+          retention-days: 7
+# Simulator-only binary. Not signed, not an IPA, not TestFlight.
+# No Firebase, Netlify, or Mac broadcast production permissions.
