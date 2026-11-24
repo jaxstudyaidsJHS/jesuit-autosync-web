@@ -11,8 +11,8 @@ permissions:
 
 jobs:
   ios-simulator:
-    name: Xcode — unsigned iPhone simulator build
-    runs-on: macos-15
+    name: Xcode — unsigned iPhone simulator build (Intel fallback)
+    runs-on: macos-15-intel
     timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
