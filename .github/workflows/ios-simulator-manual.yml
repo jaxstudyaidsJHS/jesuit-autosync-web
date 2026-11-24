@@ -1,0 +1,35 @@
+name: Jesuit 2.0 — iOS simulator build (manual macOS)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios-simulator:
+    name: Generate and compile unsigned iOS simulator app
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report developer tools
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Install XcodeGen if unavailable
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+      - name: Generate Xcode project
+        run: xcodegen generate --spec project.yml
+        working-directory: ios/JesuitScoreboardsApp
+      - name: Build unsigned iPhone simulator app
+        run: |
+          xcodebuild -project JesuitScoreboardsDev.xcodeproj \
+            -scheme JesuitScoreboardsDev -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build
+        working-directory: ios/JesuitScoreboardsApp
+# This is a MANUAL validation step, not evidence of a TestFlight/signed app.
+# No production deploy, Apple account, Firebase, Mac broadcast or OBS mutation.
